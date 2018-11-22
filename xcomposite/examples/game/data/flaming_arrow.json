@@ -1,0 +1,8 @@
+{
+  "name": "Flaming Arrow",
+  "properties": [
+    "Flame",
+    "Weapon",
+    "Projectile"
+  ]
+}
