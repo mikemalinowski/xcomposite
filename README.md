@@ -1,4 +1,4 @@
-# XComposites Overview
+# XComposite Overview
 This module exposes the composite design pattern in an easy to use way
 which attempts to minimalise the repetitive overhead.
 
@@ -7,7 +7,7 @@ when there is no clear hierarchical chain. Examples might include assigning
 roles to entities - where an entity can have any variation of roles.
 
 Methods between composite parts can return all manor of variable types, 
-therefore Composite gives you a library of decorators which you can utilise
+therefore xcomposite gives you a library of decorators which you can utilise
 to define how the collective set of results should be wrangled and returned.
 
 __Note: This is currently pre-release__
