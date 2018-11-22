@@ -12,6 +12,15 @@ to define how the collective set of results should be wrangled and returned.
 
 __Note: This is currently pre-release__
 
+## Installation
+You can install this using pip:
+```commandline
+pip install xcomposite
+```
+
+Alternatively you can get the source from:
+https://github.com/mikemalinowski/xcomposite
+
 ## Composition Inheritence
 You can utilise this pattern like this:
 
