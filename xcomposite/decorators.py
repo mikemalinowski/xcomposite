@@ -98,6 +98,8 @@ class Extend(CompositeDecorator):
     """
     This decorator assumes all returns are lists and will use list.extend
     on each list given resulting in a single list of all results.
+
+    Note: All returns must be a list
     """
 
     # --------------------------------------------------------------------------
@@ -116,6 +118,8 @@ class Append(CompositeDecorator):
     """
     This decorator will append each result - regardless of type - into a
     list.
+
+    Note: All returns must be a list
     """
 
     # --------------------------------------------------------------------------
@@ -129,6 +133,8 @@ class AppendUnique(CompositeDecorator):
     """
     This decorator will append each result - regardless of type - into a
     list.
+
+    Note: All returns must be a list
     """
 
     # --------------------------------------------------------------------------
@@ -141,6 +147,8 @@ class AppendUnique(CompositeDecorator):
 class Update(CompositeDecorator):
     """
     This decorator will update each dictionary results in order
+
+    Note: All returns must be a dictionary
     """
 
     # --------------------------------------------------------------------------
@@ -159,6 +167,8 @@ class First(CompositeDecorator):
     """
     This decorator will return the first item returned from any of the
     composited methods.
+
+    Note: All returns must be a list
     """
 
     # --------------------------------------------------------------------------
@@ -175,6 +185,8 @@ class Last(CompositeDecorator):
     """
     This decorator will return the last item returned from any of the
     composited methods.
+
+    Note: All returns must be a list
     """
 
     # --------------------------------------------------------------------------
@@ -192,6 +204,8 @@ class UpdateDict(CompositeDecorator):
     This decorator assumes that all methods will return dictionaries
     and the resulting value will be the equivalent of a dict.update
     from each method call.
+
+    Note: All returns must be a dictionary
     """
 
     # --------------------------------------------------------------------------
@@ -210,6 +224,8 @@ class Min(CompositeDecorator):
     """
     This decorator assumes a numeric return from each method and will
     return the smallest value.
+
+    Note: This expects numeric values
     """
 
     # --------------------------------------------------------------------------
@@ -223,6 +239,8 @@ class Max(CompositeDecorator):
     """
     This decorator assumes a numeric return from each method and will
     return the highest value.
+
+    Note: This expects numeric values
     """
 
     # --------------------------------------------------------------------------
@@ -236,6 +254,8 @@ class Sum(CompositeDecorator):
     """
     This decorator assumes a numeric return from each method and will
     return the sum of all the values.
+
+    Note: This expects numeric values
     """
 
     # --------------------------------------------------------------------------
@@ -249,6 +269,8 @@ class Average(CompositeDecorator):
     """
     This decorator assumes a numeric return from each method and will
     return the average (mean) of all the values.
+
+    Note: This expects numeric values
     """
 
     # --------------------------------------------------------------------------
@@ -263,6 +285,21 @@ class Average(CompositeDecorator):
             return sum_of_items
 
         return sum_of_items / len(items)
+
+
+# ------------------------------------------------------------------------------
+class Range(CompositeDecorator):
+    """
+    Returns the range of all the values (max - min). If only one value
+    is given the range will be zero.
+
+    Note: This expects numeric values
+    """
+
+    # --------------------------------------------------------------------------
+    @classmethod
+    def resolve(cls, items):
+        return max(items) - min(items)
 
 
 # ------------------------------------------------------------------------------
