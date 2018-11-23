@@ -173,9 +173,9 @@ class First(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Last(CompositeDecorator):
     """
-        This decorator will return the last item returned from any of the
-        composited methods.
-        """
+    This decorator will return the last item returned from any of the
+    composited methods.
+    """
 
     # --------------------------------------------------------------------------
     @classmethod
@@ -234,9 +234,9 @@ class Max(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Sum(CompositeDecorator):
     """
-        This decorator assumes a numeric return from each method and will
-        return the sum of all the values.
-        """
+    This decorator assumes a numeric return from each method and will
+    return the sum of all the values.
+    """
 
     # --------------------------------------------------------------------------
     @classmethod
@@ -247,9 +247,9 @@ class Sum(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Average(CompositeDecorator):
     """
-        This decorator assumes a numeric return from each method and will
-        return the average (mean) of all the values.
-        """
+    This decorator assumes a numeric return from each method and will
+    return the average (mean) of all the values.
+    """
 
     # --------------------------------------------------------------------------
     @classmethod
@@ -263,3 +263,69 @@ class Average(CompositeDecorator):
             return sum_of_items
 
         return sum_of_items / len(items)
+
+
+# ------------------------------------------------------------------------------
+class AbsoluteTrue(CompositeDecorator):
+    """
+    Returns True if all elements evaluate to True, otherwise False
+    is returned.
+    """
+
+    # --------------------------------------------------------------------------
+    @classmethod
+    def resolve(cls, items):
+        for item in items:
+            if not item:
+                return False
+
+        return True
+
+
+# ------------------------------------------------------------------------------
+class AbsoluteFalse(CompositeDecorator):
+    """
+    Returns False if all elements evaluate to False, otherwise True
+    is returned.
+    """
+
+    # --------------------------------------------------------------------------
+    @classmethod
+    def resolve(cls, items):
+        for item in items:
+            if item:
+                return True
+
+        return False
+
+
+# ------------------------------------------------------------------------------
+class AnyFalse(CompositeDecorator):
+    """
+    If any items are False, then false is returned.
+    """
+
+    # --------------------------------------------------------------------------
+    @classmethod
+    def resolve(cls, items):
+        for item in items:
+            if not item:
+                return False
+
+        return True
+
+
+# ------------------------------------------------------------------------------
+class AnyTrue(CompositeDecorator):
+    """
+    If any items are True, then True is returned.
+    """
+
+    # --------------------------------------------------------------------------
+    @classmethod
+    def resolve(cls, items):
+        for item in items:
+            if item:
+                return True
+
+        return False
