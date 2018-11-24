@@ -21,6 +21,9 @@ pip install xcomposite
 Alternatively you can get the source from:
 https://github.com/mikemalinowski/xcomposite
 
+## Code Documentation:
+https://mikemalinowski.github.io/xcomposite/
+
 ## Composition Inheritence
 You can utilise this pattern like this:
 
