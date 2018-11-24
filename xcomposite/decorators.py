@@ -9,7 +9,22 @@ class CompositeDecorator(object):
     re-implement the resolve method. See the resolve method doc
     string for more details.
 
-    Internally this method utilises a tracking uuid to match
+    resolve is given a list of all the returns. You can then wrangle
+    that in any way you want. What you return from 'resolve' is what
+    will be returned to the user.
+
+    .. code-block:: python
+
+    >>> class MyCustomDecorator(CompositeDecorator):
+    ... 
+    ...     @classmethod
+    ...     def resolve(cls, items):
+    ...         output = list()
+    ... 
+    ...         for item in items:
+    ...             output.extend(item)
+    ...
+    ...         return output
     """
     __metaclass__ = abc.ABCMeta
 
@@ -96,10 +111,22 @@ class CompositeDecorator(object):
 # ------------------------------------------------------------------------------
 class Extend(CompositeDecorator):
     """
+    .. decorator:: Extend
+
     This decorator assumes all returns are lists and will use list.extend
     on each list given resulting in a single list of all results.
 
-    Note: All returns must be a list
+    >>> class A(object):
+    ...     @xcomposite.Extend
+    ...     def items(self):
+    ...         return ['a', 'b']
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Extend
+    ...     def items(self):
+    ...         return ['x', 'y']
+    ['a', 'b', 'x', 'y']
     """
 
     # --------------------------------------------------------------------------
@@ -116,10 +143,22 @@ class Extend(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Append(CompositeDecorator):
     """
+    .. decorator:: Append
+
     This decorator will append each result - regardless of type - into a
     list.
 
-    Note: All returns must be a list
+    >>> class A(object):
+    ...     @xcomposite.Append
+    ...     def items(self):
+    ...         return None
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Append
+    ...     def items(self):
+    ...         return ['x', 'y']
+    [None, ['x', 'y']]
     """
 
     # --------------------------------------------------------------------------
@@ -131,10 +170,27 @@ class Append(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class AppendUnique(CompositeDecorator):
     """
+    .. decorator:: AppendUnique
+
     This decorator will append each result - regardless of type - into a
     list.
 
-    Note: All returns must be a list
+    >>> class A(object):
+    ...     @xcomposite.AppendUnique
+    ...     def items(self):
+    ...         return 1
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.AppendUnique
+    ...     def items(self):
+    ...         return 1
+    >>> 
+    >>> class B(object):
+    ...     @xcomposite.AppendUnique
+    ...     def items(self):
+    ...         return 2
+    [1, 2]
     """
 
     # --------------------------------------------------------------------------
@@ -146,9 +202,21 @@ class AppendUnique(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Update(CompositeDecorator):
     """
+    .. decorator:: Update
+
     This decorator will update each dictionary results in order
 
-    Note: All returns must be a dictionary
+    >>> class A(object):
+    ...     @xcomposite.Update
+    ...     def items(self):
+    ...         return {'foo': 1}
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Update
+    ...     def items(self):
+    ...         return {'bar': 2}
+    {'foo': 1, 'bar': 2}
     """
 
     # --------------------------------------------------------------------------
@@ -165,10 +233,22 @@ class Update(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class First(CompositeDecorator):
     """
+    .. decorator:: First
+
     This decorator will return the first item returned from any of the
     composited methods.
 
-    Note: All returns must be a list
+    >>> class A(object):
+    ...     @xcomposite.First
+    ...     def items(self):
+    ...         return 10
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.First
+    ...     def items(self):
+    ...         return 5
+    10
     """
 
     # --------------------------------------------------------------------------
@@ -183,10 +263,22 @@ class First(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Last(CompositeDecorator):
     """
+    .. decorator:: Last
+
     This decorator will return the last item returned from any of the
     composited methods.
 
-    Note: All returns must be a list
+    >>> class A(object):
+    ...     @xcomposite.Last
+    ...     def items(self):
+    ...         return 10
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Last
+    ...     def items(self):
+    ...         return 5
+    5
     """
 
     # --------------------------------------------------------------------------
@@ -201,11 +293,23 @@ class Last(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class UpdateDict(CompositeDecorator):
     """
+    .. decorator:: UpdateDict
+
     This decorator assumes that all methods will return dictionaries
     and the resulting value will be the equivalent of a dict.update
     from each method call.
 
-    Note: All returns must be a dictionary
+    >>> class A(object):
+    ...     @xcomposite.UpdateDict
+    ...     def items(self):
+    ...         return {'foo': 1}
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.UpdateDict
+    ...     def items(self):
+    ...         return {'bar': 2}
+    {'foo': 1, 'bar': 2}
     """
 
     # --------------------------------------------------------------------------
@@ -222,10 +326,22 @@ class UpdateDict(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Min(CompositeDecorator):
     """
+    .. decorator:: Min
+
     This decorator assumes a numeric return from each method and will
     return the smallest value.
 
-    Note: This expects numeric values
+    >>> class A(object):
+    ...     @xcomposite.Min
+    ...     def items(self):
+    ...         return 10
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Min
+    ...     def items(self):
+    ...         return 5
+    5
     """
 
     # --------------------------------------------------------------------------
@@ -237,10 +353,22 @@ class Min(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Max(CompositeDecorator):
     """
+    .. decorator:: Max
+
     This decorator assumes a numeric return from each method and will
     return the highest value.
 
-    Note: This expects numeric values
+        >>> class A(object):
+        ...     @xcomposite.Max
+        ...     def items(self):
+        ...         return 10
+        >>>
+        >>>
+        >>> class B(object):
+        ...     @xcomposite.Max
+        ...     def items(self):
+        ...         return 5
+        10
     """
 
     # --------------------------------------------------------------------------
@@ -252,10 +380,22 @@ class Max(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Sum(CompositeDecorator):
     """
+    .. decorator:: Sum
+
     This decorator assumes a numeric return from each method and will
     return the sum of all the values.
 
-    Note: This expects numeric values
+    >>> class A(object):
+    ...     @xcomposite.Sum
+    ...     def items(self):
+    ...         return 10
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Sum
+    ...     def items(self):
+    ...         return 5
+    15
     """
 
     # --------------------------------------------------------------------------
@@ -267,10 +407,22 @@ class Sum(CompositeDecorator):
 # ------------------------------------------------------------------------------
 class Average(CompositeDecorator):
     """
+    .. decorator:: Average
+
     This decorator assumes a numeric return from each method and will
     return the average (mean) of all the values.
 
-    Note: This expects numeric values
+    >>> class A(object):
+    ...     @xcomposite.Sum
+    ...     def items(self):
+    ...         return 0
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Sum
+    ...     def items(self):
+    ...         return 10
+    5
     """
 
     # --------------------------------------------------------------------------
@@ -294,6 +446,18 @@ class Range(CompositeDecorator):
     is given the range will be zero.
 
     Note: This expects numeric values
+    
+    >>> class A(object):
+    ...     @xcomposite.Range
+    ...     def items(self):
+    ...         return 5
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.Range
+    ...     def items(self):
+    ...         return 20
+    15
     """
 
     # --------------------------------------------------------------------------
@@ -307,6 +471,18 @@ class AbsoluteTrue(CompositeDecorator):
     """
     Returns True if all elements evaluate to True, otherwise False
     is returned.
+    
+    >>> class A(object):
+    ...     @xcomposite.AbsoluteTrue
+    ...     def items(self):
+    ...         return True
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.AbsoluteTrue
+    ...     def items(self):
+    ...         return False
+    False
     """
 
     # --------------------------------------------------------------------------
@@ -324,6 +500,18 @@ class AbsoluteFalse(CompositeDecorator):
     """
     Returns False if all elements evaluate to False, otherwise True
     is returned.
+    
+    >>> class A(object):
+    ...     @xcomposite.AbsoluteFalse
+    ...     def items(self):
+    ...         return True
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.AbsoluteFalse
+    ...     def items(self):
+    ...         return False
+    True
     """
 
     # --------------------------------------------------------------------------
@@ -340,6 +528,18 @@ class AbsoluteFalse(CompositeDecorator):
 class AnyFalse(CompositeDecorator):
     """
     If any items are False, then false is returned.
+    
+    >>> class A(object):
+    ...     @xcomposite.AnyFalse
+    ...     def items(self):
+    ...         return True
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.AnyFalse
+    ...     def items(self):
+    ...         return False
+    False
     """
 
     # --------------------------------------------------------------------------
@@ -356,6 +556,18 @@ class AnyFalse(CompositeDecorator):
 class AnyTrue(CompositeDecorator):
     """
     If any items are True, then True is returned.
+    
+    >>> class A(object):
+    ...     @xcomposite.AnyTrue
+    ...     def items(self):
+    ...         return True
+    >>>
+    >>>
+    >>> class B(object):
+    ...     @xcomposite.AnyTrue
+    ...     def items(self):
+    ...         return False
+    True
     """
 
     # --------------------------------------------------------------------------

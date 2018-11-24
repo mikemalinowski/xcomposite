@@ -27,7 +27,7 @@ roles to entities - where an entity can have any variation of roles.
 
 You can utilise this pattern like this:
 
-    ..code-block:: python
+    .. code-block:: python
 
         >>> import xcomposite
         >>>
@@ -65,7 +65,7 @@ ability to structure your classes with the composition module in mind. However
 if you are using classes which you can only use passively you can take the
 following approach:
 
-    ..code-block:: python
+    .. code-block:: python
 
         >>> import xcomposite
         >>>
@@ -121,10 +121,6 @@ run these demos with the following code:
     >>>
     >>> personnel.demo()
 """
-__author__ = "Michael Malinowski"
-__copyright__ = "Copyright (C) 2018 Michael Malinowski"
-__license__ = "MIT"
-__version__ = "0.9.6"
 
 from .core import (
     Ignore,
@@ -144,6 +140,36 @@ from .decorators import (
     AnyTrue,
     AnyFalse,
     AbsoluteTrue,
-    AbsoluteFalse,
     AppendUnique,
+    AnyTrue,
+    AnyFalse,
+    AbsoluteTrue,
+    AbsoluteFalse,
+    CompositeDecorator,
 )
+
+
+__author__ = "Michael Malinowski"
+__copyright__ = "Copyright (C) 2018 Michael Malinowski"
+__license__ = "MIT"
+__version__ = "0.9.7"
+
+__all__ = [
+    'Composition',
+    'Ignore',
+    'Min',
+    'Max',
+    'Sum',
+    'Last',
+    'First',
+    'Append',
+    'Update',
+    'Extend',
+    'Average',
+    'AppendUnique',
+    'AnyTrue',
+    'AnyFalse',
+    'AbsoluteTrue',
+    'AbsoluteFalse',
+    'CompositeDecorator',
+]

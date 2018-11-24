@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='xcomposite',
-    version='0.9.6',
+    version='0.9.7',
     author='Mike Malinowski',
     author_email='mike@twisted.space',
     description='A python package exposing the class composition design pattern',
