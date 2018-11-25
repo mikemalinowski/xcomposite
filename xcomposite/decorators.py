@@ -291,39 +291,6 @@ class Last(CompositeDecorator):
 
 
 # ------------------------------------------------------------------------------
-class UpdateDict(CompositeDecorator):
-    """
-    .. decorator:: UpdateDict
-
-    This decorator assumes that all methods will return dictionaries
-    and the resulting value will be the equivalent of a dict.update
-    from each method call.
-
-    >>> class A(object):
-    ...     @xcomposite.UpdateDict
-    ...     def items(self):
-    ...         return {'foo': 1}
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.UpdateDict
-    ...     def items(self):
-    ...         return {'bar': 2}
-    {'foo': 1, 'bar': 2}
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        output = dict()
-
-        for item in items:
-            output.update(item)
-
-        return output
-
-
-# ------------------------------------------------------------------------------
 class Min(CompositeDecorator):
     """
     .. decorator:: Min

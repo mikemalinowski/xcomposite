@@ -152,7 +152,7 @@ from .decorators import (
 __author__ = "Michael Malinowski"
 __copyright__ = "Copyright (C) 2018 Michael Malinowski"
 __license__ = "MIT"
-__version__ = "0.9.7"
+__version__ = "1.0.0"
 
 __all__ = [
     'Composition',
