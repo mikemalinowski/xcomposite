@@ -36,8 +36,8 @@ class CompositeDecorator(object):
 
     # --------------------------------------------------------------------------
     def __call__(self, *args, **kwargs):
+        # -- This is passing the decorator as self!?
         return self._method(
-            self,
             *args,
             **kwargs
         )

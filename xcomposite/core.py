@@ -161,8 +161,8 @@ class Composition(object):
         )
 
     # --------------------------------------------------------------------------
-    @classmethod
-    def _propogate_call(cls, methods, *args, **kwargs):
+    #@classmethod
+    def _propogate_call(self, methods, *args, **kwargs):
         """
         This method is responsible for call the listed methods from
         all the composited classes.
@@ -207,6 +207,7 @@ class Composition(object):
 
             # -- Call the method with all the given arguments
             result = method(
+                self,
                 *args,
                 **kwargs
             )
