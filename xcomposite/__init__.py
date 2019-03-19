@@ -32,144 +32,76 @@ You can utilise this pattern like this:
         >>> import xcomposite
         >>>
         >>>
-        >>> # -- Inheriting off the composition class means that your class can
-        >>> # -- immediately bind any other class of a Composition type.
-        >>> # -- You should declare (through composite decorators) what the
-        >>> # -- expactation is of any bound methods. This allows you to tailor
-        >>> # -- exactly how the results should be combined/returned.
+        >>> # -- The composition class defines the decoration rules for
+        >>> # -- each method which requires compositing. This must inherit
+        >>> # -- from the xcomposite.Composition class.
         >>> class A(xcomposite.Composition):
         ...
-        ...     @xcomposite.Extend
+        ...     @xcomposite.extend_results
         ...     def items(self):
         ...         return ['a', 'b']
         >>>
         >>>
-        >>> class B(xcomposite.Composition):
+        >>> # -- The class(es) being bound to the composition do not need
+        >>> # -- to inherit from the composition. Equally their functions
+        >>> # -- do not need to be decorated either
+        >>> class B(object):
         ...
-        ...     @xcomposite.Extend
         ...     def items(self):
         ...         return ['x', 'y']
         >>>
         >>>
-        >>> # -- Instance any one of the classes, and bind it to the instance
-        >>> # -- of the other
+        >>> # -- We instance the composition, then bind any amount of classes
+        >>> # -- to that composition. All classes being bound to a composition
+        >>> # -- *must* be class instances.
         >>> a = A()
         >>> a.bind(B())
         >>>
         >>> # -- Call the items method, noting that the result is the expected
         >>> # -- list of items from the 'items' call of both A and B
+        >>> # -- The composition cycles through all the bound classes, and 
+        >>> # -- where it finds a class with the same method name it will be
+        >>> # -- called.
         >>> print(a.items())
 
-The above example shows how this module can be used when you have the
-ability to structure your classes with the composition module in mind. However
-if you are using classes which you can only use passively you can take the
-following approach:
+# Restrictions
 
-    .. code-block:: python
+Version 2.0.0 onward is significantly different to version 1.x, and is therefore
+not compatible without changes. 
 
-        >>> import xcomposite
-        >>>
-        >>>
-        >>> # -- Define a class which we do not want to have inheriting
-        >>> # -- from composites. We also do not want to alter methods
-        >>> # -- with decorators. This examplifies a situation where the
-        >>> # -- classes to be bound are third-party.
-        >>> class A(object):
-        ...     def items(self):
-        ...         return ['a', 'b']
-        >>>
-        >>>
-        >>> class B(object):
-        ...     def items(self):
-        ...         return ['x', 'y']
-        >>>
-        >>>
-        >>> # -- Because we cannot bind directly within the A or B class
-        >>> # -- we instead define a composition wrapper. This is much like
-        >>> # -- an abstract - it has no functionality but declares which
-        >>> # -- methods should be considered bound and how they should be
-        >>> # -- handled.
-        >>> class Wrapper(xcomposite.Composition):
-        ...
-        ...     @xcomposite.Extend
-        ...     def items(self):
-        ...         return xcomposite.Ignore
-        >>>
-        >>>
-        >>> # -- Instance our wrapper and bind an instance of A and B to it
-        >>> inst = Wrapper()
-        >>> inst.bind(A())
-        >>> inst.bind(B())
-        >>>
-        >>> # -- Call the items method, noting that the result is the expected
-        >>> # -- list of items from the 'items' call of both A and B
-        >>> print(inst.items())
+All methods decorated with xcomposite decorators are expected to be instance
+methods and not class methods.
 
-There are two examples which come packaged with the module which attempt to
-demonstrate simple use-cases which just print output for inspection. You can
-run these demos with the following code:
-
-..code-block:: python
-
-    >>> from xcomposite.examples import game
-    >>>
-    >>> game.demo()
-
-..code-block:: python
-
-    >>> from xcomposite.examples import personnel
-    >>>
-    >>> personnel.demo()
+Functions which are decorated with xcomposite decorators may be decorated
+with other decorators, but any additional decorators should sit atop of the
+xcomposite decorator.
 """
-
 from .core import (
     Ignore,
     Composition,
 )
 
 from .decorators import (
-    Min,
-    Max,
-    Sum,
-    Last,
-    First,
-    Append,
-    Update,
-    Extend,
-    Average,
-    AnyTrue,
-    AnyFalse,
-    AbsoluteTrue,
-    AppendUnique,
-    AnyTrue,
-    AnyFalse,
-    AbsoluteTrue,
-    AbsoluteFalse,
-    CompositeDecorator,
+    take_min,
+    take_max,
+    take_sum,
+    take_range,
+    take_average,
+    take_first,
+    take_last,
+    any_true,
+    any_false,
+    absolute_true,
+    absolute_false,
+    append_unique,
+    append_results,
+    extend_results,
+    extend_unique,
+    update_dictionary,
+
+
 )
-
-
 __author__ = "Michael Malinowski"
-__copyright__ = "Copyright (C) 2018 Michael Malinowski"
+__copyright__ = "Copyright (C) 2019 Michael Malinowski"
 __license__ = "MIT"
-__version__ = "1.0.1"
-
-__all__ = [
-    'Composition',
-    'Ignore',
-    'Min',
-    'Max',
-    'Sum',
-    'Last',
-    'First',
-    'Append',
-    'Update',
-    'Extend',
-    'Average',
-    'AppendUnique',
-    'AnyTrue',
-    'AnyFalse',
-    'AbsoluteTrue',
-    'AbsoluteFalse',
-    'CompositeDecorator',
-]
+__version__ = "2.0.1"

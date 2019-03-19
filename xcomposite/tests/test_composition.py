@@ -1,5 +1,6 @@
 import unittest
 from xcomposite.tests.classes import (
+    DecoratorBase,
     DecoratorTesterA,
     DecoratorTesterB,
 )
@@ -16,15 +17,17 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         # -- Instance both classes
+        base_class = DecoratorBase()
         first_class = DecoratorTesterA()
         second_class = DecoratorTesterB()
 
         # -- Perform the bind
-        first_class.bind(second_class)
+        base_class.bind(first_class)
+        base_class.bind(second_class)
 
         self.assertIn(
             second_class,
-            first_class.components(),
+            base_class.components(),
         )
 
     # --------------------------------------------------------------------------
@@ -35,7 +38,7 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         # -- Instance both classes
-        first_class = DecoratorTesterA()
+        first_class = DecoratorBase()
         second_class = DecoratorTesterB()
 
         # -- Perform the bind
@@ -62,7 +65,7 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         # -- Instance both classes
-        first_class = DecoratorTesterA()
+        first_class = DecoratorBase()
         second_class = DecoratorTesterB()
 
         # -- Perform the bind
@@ -86,14 +89,14 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         # -- Instance both classes
-        first_class = DecoratorTesterA()
+        first_class = DecoratorBase()
         second_class = DecoratorTesterB()
 
         # -- Perform the bind
         first_class.bind(second_class)
 
         self.assertEqual(
-            '[DecoratorTesterA (DecoratorTesterB)]',
+            '[DecoratorBase (DecoratorTesterB)]',
             str(first_class),
         )
 
@@ -105,10 +108,10 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         # -- Instance both classes
-        first_class = DecoratorTesterA()
+        first_class = DecoratorBase()
 
         self.assertEqual(
-            'DecoratorTesterA',
+            'DecoratorBase',
             str(first_class),
         )
 
@@ -120,7 +123,7 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         # -- Instance both classes
-        first_class = DecoratorTesterA()
+        first_class = DecoratorBase()
 
         try:
             first_class.foo()

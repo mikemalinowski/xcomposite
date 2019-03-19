@@ -1,8 +1,0 @@
-{
-  "name": "Juicy Apple",
-  "properties": [
-    "Consumable",
-    "Edible",
-    "Projectile"
-  ]
-}

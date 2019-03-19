@@ -1,547 +1,384 @@
-import abc
-import uuid
+from .core import Ignore
 
 
 # ------------------------------------------------------------------------------
-class CompositeDecorator(object):
+def _methods(composition_class, method_name):
     """
-    All decorators wanting to base off this should only need to
-    re-implement the resolve method. See the resolve method doc
-    string for more details.
-
-    resolve is given a list of all the returns. You can then wrangle
-    that in any way you want. What you return from 'resolve' is what
-    will be returned to the user.
-
-    .. code-block:: python
-
-    >>> class MyCustomDecorator(CompositeDecorator):
-    ... 
-    ...     @classmethod
-    ...     def resolve(cls, items):
-    ...         output = list()
-    ... 
-    ...         for item in items:
-    ...             output.extend(item)
-    ...
-    ...         return output
+    Convenience function for getting a list of all the methods
+    which require calling.
     """
-    __metaclass__ = abc.ABCMeta
+    return [
+        getattr(component, method_name)
+        for component in composition_class.components()
+    ]
 
-    _RESULTS = dict()
 
-    # --------------------------------------------------------------------------
-    def __init__(self, method):
-        self._method = method
+# ------------------------------------------------------------------------------
+def _results(composition_class, method_name, *args, **kwargs):
+    """
+    Convenience function for return all teh results for the methods
+    with the given name on the class.
 
-    # --------------------------------------------------------------------------
-    def __call__(self, *args, **kwargs):
-        # -- This is passing the decorator as self!?
-        return self._method(
+    :param composition_class: xcomposite.Composition 
+    :param method_name: Name of method to call
+    :param args: Args to pass to call
+    :param kwargs: Keyword arguments to pass
+
+    :return: List of results 
+    """
+    results = list()
+
+    for method in _methods(composition_class, method_name):
+        result = method(*args[1:], **kwargs)
+
+        if not isinstance(result, Ignore):
+            results.append(result)
+
+    return results
+
+
+# ------------------------------------------------------------------------------
+def take_min(func):
+    """
+    This decorator assumes a numeric return from each method and will
+    return the smallest value.
+    """
+
+    def inner(*args, **kwargs):
+        return min(
+            _results(
+                args[0],
+                func.__name__,
+                *args,
+                **kwargs
+            )
+        )
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def take_max(func):
+    """
+    This decorator assumes a numeric return from each method and will
+    return the highest value.
+    """
+
+    def inner(*args, **kwargs):
+        return max(
+            _results(
+                args[0],
+                func.__name__,
+                *args,
+                **kwargs
+            )
+        )
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def take_sum(func):
+    """
+    This decorator assumes a numeric return from each method and will
+    return the sum of all the values. 
+    """
+
+    def inner(*args, **kwargs):
+        return sum(
+            _results(
+                args[0],
+                func.__name__,
+                *args,
+                **kwargs
+            )
+        )
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def take_average(func):
+    """
+    This decorator assumes a numeric return from each method and will
+    return the average (mean) of all the values.
+    """
+
+    def inner(*args, **kwargs):
+        results = _results(
+            args[0],
+            func.__name__,
             *args,
             **kwargs
         )
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def start(cls):
-        """
-        This will initialise the internal tracking property
-        for cross instance data resolving. This function will
-        return a uuid which should be passed to any subsequent
-        storage calls.
+        sum_of_results = sum(results)
 
-        :return: uuid
-        """
-        identifier = str(uuid.uuid4())
-        cls._RESULTS[identifier] = list()
+        if sum_of_results == 0:
+            return sum_of_results
 
-        return identifier
+        return sum_of_results / len(results)
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def store(cls, item, identifier):
-        """
-        This will store the item against the giving uuid.
-
-        :param item: The item to store
-        :param identifier: The uuid to store against
-
-        :return:
-        """
-        if identifier not in cls._RESULTS:
-            raise Exception('%s is an invalid identifier' % identifier)
-
-        cls._RESULTS[identifier].append(item)
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def clear(cls, identifier):
-        """
-        This clears all the results for the given uuid
-
-        :param identifier:
-        :return:
-        """
-        del cls._RESULTS[identifier]
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def results(cls, identifier):
-        return cls._RESULTS[identifier]
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    @abc.abstractmethod
-    def resolve(cls, items):
-        """
-        This is the only function you need to re-implement in most
-        cases. It allows you to take the results from all the method
-        calls and decide what form to return them in.
-
-        :param items: These are the results from all the method
-            calls from the composited object.
-        :type items: list(var, var, ...)
-
-        :return:
-        """
-        return
+    return inner
 
 
 # ------------------------------------------------------------------------------
-class Extend(CompositeDecorator):
+def take_first(func):
     """
-    .. decorator:: Extend
-
-    This decorator assumes all returns are lists and will use list.extend
-    on each list given resulting in a single list of all results.
-
-    >>> class A(object):
-    ...     @xcomposite.Extend
-    ...     def items(self):
-    ...         return ['a', 'b']
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Extend
-    ...     def items(self):
-    ...         return ['x', 'y']
-    ['a', 'b', 'x', 'y']
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        output = list()
-
-        for item in items:
-            output.extend(item)
-
-        return output
-
-
-# ------------------------------------------------------------------------------
-class Append(CompositeDecorator):
-    """
-    .. decorator:: Append
-
-    This decorator will append each result - regardless of type - into a
-    list.
-
-    >>> class A(object):
-    ...     @xcomposite.Append
-    ...     def items(self):
-    ...         return None
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Append
-    ...     def items(self):
-    ...         return ['x', 'y']
-    [None, ['x', 'y']]
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        return items
-
-
-# ------------------------------------------------------------------------------
-class AppendUnique(CompositeDecorator):
-    """
-    .. decorator:: AppendUnique
-
-    This decorator will append each result - regardless of type - into a
-    list.
-
-    >>> class A(object):
-    ...     @xcomposite.AppendUnique
-    ...     def items(self):
-    ...         return 1
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.AppendUnique
-    ...     def items(self):
-    ...         return 1
-    >>> 
-    >>> class B(object):
-    ...     @xcomposite.AppendUnique
-    ...     def items(self):
-    ...         return 2
-    [1, 2]
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        return list(set(items))
-
-
-# ------------------------------------------------------------------------------
-class Update(CompositeDecorator):
-    """
-    .. decorator:: Update
-
-    This decorator will update each dictionary results in order
-
-    >>> class A(object):
-    ...     @xcomposite.Update
-    ...     def items(self):
-    ...         return {'foo': 1}
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Update
-    ...     def items(self):
-    ...         return {'bar': 2}
-    {'foo': 1, 'bar': 2}
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        output = dict()
-
-        for item in items:
-            output.update(item)
-
-        return output
-
-
-# ------------------------------------------------------------------------------
-class First(CompositeDecorator):
-    """
-    .. decorator:: First
-
     This decorator will return the first item returned from any of the
     composited methods.
-
-    >>> class A(object):
-    ...     @xcomposite.First
-    ...     def items(self):
-    ...         return 10
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.First
-    ...     def items(self):
-    ...         return 5
-    10
     """
+    def inner(*args, **kwargs):
+        print('In Decorator')
+        for method in _methods(args[0], func.__name__):
+            result = method(*args[1:], **kwargs)
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        if items:
-            return items[0]
+            if not isinstance(result, Ignore):
+                return result
 
         return None
 
+    return inner
+
 
 # ------------------------------------------------------------------------------
-class Last(CompositeDecorator):
+def take_last(func):
     """
-    .. decorator:: Last
-
     This decorator will return the last item returned from any of the
     composited methods.
-
-    >>> class A(object):
-    ...     @xcomposite.Last
-    ...     def items(self):
-    ...         return 10
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Last
-    ...     def items(self):
-    ...         return 5
-    5
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        if items:
-            return items[-1]
+    def inner(*args, **kwargs):
+        for method in reversed(_methods(args[0], func.__name__)):
+            result = method(*args[1:], **kwargs)
+
+            if not isinstance(result, Ignore):
+                return result
 
         return None
 
-
-# ------------------------------------------------------------------------------
-class Min(CompositeDecorator):
-    """
-    .. decorator:: Min
-
-    This decorator assumes a numeric return from each method and will
-    return the smallest value.
-
-    >>> class A(object):
-    ...     @xcomposite.Min
-    ...     def items(self):
-    ...         return 10
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Min
-    ...     def items(self):
-    ...         return 5
-    5
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        return min(items)
+    return inner
 
 
 # ------------------------------------------------------------------------------
-class Max(CompositeDecorator):
+def extend_results(func):
     """
-    .. decorator:: Max
-
-    This decorator assumes a numeric return from each method and will
-    return the highest value.
-
-        >>> class A(object):
-        ...     @xcomposite.Max
-        ...     def items(self):
-        ...         return 10
-        >>>
-        >>>
-        >>> class B(object):
-        ...     @xcomposite.Max
-        ...     def items(self):
-        ...         return 5
-        10
+    This decorator assumes all returns are lists and will use list.extend
+    on each list given resulting in a single list of all results.
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        return max(items)
+    def inner(*args, **kwargs):
+        extended_results = list()
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
+
+        for result in results:
+            if not isinstance(result, Ignore):
+                extended_results.extend(result)
+
+        return extended_results
+
+    return inner
 
 
 # ------------------------------------------------------------------------------
-class Sum(CompositeDecorator):
+def extend_unique(func):
     """
-    .. decorator:: Sum
-
-    This decorator assumes a numeric return from each method and will
-    return the sum of all the values.
-
-    >>> class A(object):
-    ...     @xcomposite.Sum
-    ...     def items(self):
-    ...         return 10
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Sum
-    ...     def items(self):
-    ...         return 5
-    15
+    This decorator assumes all returns are lists and will use list.extend
+    on each list given resulting in a single list of all results.
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        return sum(items)
+    def inner(*args, **kwargs):
+        extended_results = list()
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
+
+        for result in results:
+            if not isinstance(result, Ignore):
+                extended_results.extend(result)
+
+        return list(set(extended_results))
+
+    return inner
 
 
 # ------------------------------------------------------------------------------
-class Average(CompositeDecorator):
+def update_dictionary(func):
     """
-    .. decorator:: Average
-
-    This decorator assumes a numeric return from each method and will
-    return the average (mean) of all the values.
-
-    >>> class A(object):
-    ...     @xcomposite.Sum
-    ...     def items(self):
-    ...         return 0
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Sum
-    ...     def items(self):
-    ...         return 10
-    5
+    This decorator will update each dictionary results in order
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        if not items:
-            return None
+    def inner(*args, **kwargs):
+        output = dict()
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
 
-        sum_of_items = sum(items)
+        for result in results:
+            if not isinstance(result, Ignore):
+                output.update(result)
 
-        if sum_of_items == 0:
-            return sum_of_items
+        return output
 
-        return sum_of_items / len(items)
+    return inner
 
 
 # ------------------------------------------------------------------------------
-class Range(CompositeDecorator):
-    """
-    Returns the range of all the values (max - min). If only one value
-    is given the range will be zero.
-
-    Note: This expects numeric values
-    
-    >>> class A(object):
-    ...     @xcomposite.Range
-    ...     def items(self):
-    ...         return 5
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.Range
-    ...     def items(self):
-    ...         return 20
-    15
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        return max(items) - min(items)
-
-
-# ------------------------------------------------------------------------------
-class AbsoluteTrue(CompositeDecorator):
-    """
-    Returns True if all elements evaluate to True, otherwise False
-    is returned.
-    
-    >>> class A(object):
-    ...     @xcomposite.AbsoluteTrue
-    ...     def items(self):
-    ...         return True
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.AbsoluteTrue
-    ...     def items(self):
-    ...         return False
-    False
-    """
-
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        for item in items:
-            if not item:
-                return False
-
-        return True
-
-
-# ------------------------------------------------------------------------------
-class AbsoluteFalse(CompositeDecorator):
+def absolute_false(func):
     """
     Returns False if all elements evaluate to False, otherwise True
     is returned.
-    
-    >>> class A(object):
-    ...     @xcomposite.AbsoluteFalse
-    ...     def items(self):
-    ...         return True
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.AbsoluteFalse
-    ...     def items(self):
-    ...         return False
-    True
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        for item in items:
-            if item:
-                return True
+    def inner(*args, **kwargs):
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
 
+        for result in results:
+            if result:
+                return True
         return False
+
+    return inner
 
 
 # ------------------------------------------------------------------------------
-class AnyFalse(CompositeDecorator):
+def absolute_true(func):
     """
-    If any items are False, then false is returned.
-    
-    >>> class A(object):
-    ...     @xcomposite.AnyFalse
-    ...     def items(self):
-    ...         return True
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.AnyFalse
-    ...     def items(self):
-    ...         return False
-    False
+    Returns True if all elements evaluate to True, otherwise False
+    is returned.
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        for item in items:
-            if not item:
+    def inner(*args, **kwargs):
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
+
+        for result in results:
+            if not result:
                 return False
-
         return True
 
+    return inner
+
 
 # ------------------------------------------------------------------------------
-class AnyTrue(CompositeDecorator):
+def any_false(func):
+    """
+    If any items are False, then false is returned.
+    """
+
+    def inner(*args, **kwargs):
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
+
+        for result in results:
+            if not result:
+                return False
+        return True
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def any_true(func):
     """
     If any items are True, then True is returned.
-    
-    >>> class A(object):
-    ...     @xcomposite.AnyTrue
-    ...     def items(self):
-    ...         return True
-    >>>
-    >>>
-    >>> class B(object):
-    ...     @xcomposite.AnyTrue
-    ...     def items(self):
-    ...         return False
-    True
     """
 
-    # --------------------------------------------------------------------------
-    @classmethod
-    def resolve(cls, items):
-        for item in items:
-            if item:
-                return True
+    def inner(*args, **kwargs):
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
 
+        for result in results:
+            if result:
+                return True
         return False
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def append_results(func):
+    """
+    This decorator will append each result - regardless of type - into a
+    list.
+    """
+
+    def inner(*args, **kwargs):
+        return _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def append_unique(func):
+    """
+    This decorator will append each result - regardless of type - into a
+    list. 
+    """
+
+    def inner(*args, **kwargs):
+        return list(
+            set(
+                _results(
+                    args[0],
+                    func.__name__,
+                    *args,
+                    **kwargs
+                )
+            )
+        )
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def take_range(func):
+    """
+    Returns the range of all the values (max - min). If only one value
+    is given the range will be zero.
+    """
+
+    def inner(*args, **kwargs):
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
+        )
+
+        return float(max(results)) - float(min(results))
+
+    return inner

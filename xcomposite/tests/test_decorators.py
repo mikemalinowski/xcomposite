@@ -1,5 +1,6 @@
 import unittest
 from xcomposite.tests.classes import (
+    DecoratorBase,
     DecoratorTesterA,
     DecoratorTesterB,
     UndecoratedTesterA,
@@ -62,7 +63,7 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         bound_class = self._bound_class()
-
+        print(bound_class.first())
         self.assertEqual(
             'A',
             bound_class.first(),
@@ -90,7 +91,7 @@ class CompositionTests(unittest.TestCase):
         :return:
         """
         bound_class = self._bound_class()
-
+        print(bound_class.append())
         self.assertEqual(
             ['A', 'B'],
             bound_class.append(),
@@ -198,11 +199,11 @@ class CompositionTests(unittest.TestCase):
 
         :return:
         """
-        first_class = DecoratorTesterA()
-        second_class = DecoratorTesterB()
+        first_class = DecoratorBase()
 
         # -- Perform the bind
-        first_class.bind(second_class)
+        first_class.bind(DecoratorTesterA())
+        first_class.bind(DecoratorTesterB())
 
         return first_class
 
