@@ -1,4 +1,6 @@
 # XComposite Overview
+
+
 This module exposes the composite design pattern in an easy to use way
 which attempts to minimalise the repetitive overhead.
 
@@ -12,6 +14,8 @@ to define how the collective set of results should be wrangled and returned.
 
 
 ## Installation
+
+
 You can install this using pip:
 ```commandline
 pip install xcomposite
@@ -106,7 +110,9 @@ Another, similiar example might be:
     ['a', 'b', 'x', 'y', 1, 2]
 ```
 
+
 # Decorators
+
 
 All composition rules are defined as decorators which you can apply to your
 methods on your classes. The following decorators:
@@ -129,7 +135,9 @@ methods on your classes. The following decorators:
     extend_unique
     update_dictionary
     
+
 # Restrictions
+
 
  * Version 2.0.0 onward is significantly different to version 1.x, and is therefore
 not compatible without changes. 
@@ -143,12 +151,18 @@ xcomposite decorator.
 
 
 ## Testing and Stability
+
+
 There are currently unittests which cover most of composite's core, but it is not yet exhaustive.
 
 
 ## Compatability
+
+
 This has been tested under Python 2.7.13 and Python 3.6.6 on both Ubuntu and Windows.
 
 
 ## Contribute
+
+
 If you would like to contribute thoughts, ideas, fixes or features please get in touch! mike@twisted.space

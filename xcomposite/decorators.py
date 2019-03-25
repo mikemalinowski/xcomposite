@@ -129,11 +129,28 @@ def take_first(func):
     composited methods.
     """
     def inner(*args, **kwargs):
-        print('In Decorator')
         for method in _methods(args[0], func.__name__):
             result = method(*args[1:], **kwargs)
 
             if not isinstance(result, Ignore):
+                return result
+
+        return None
+
+    return inner
+
+
+# ------------------------------------------------------------------------------
+def first_true(func):
+    """
+    This decorator will return the first item returned from any of the
+    composited methods.
+    """
+    def inner(*args, **kwargs):
+        for method in _methods(args[0], func.__name__):
+            result = method(*args[1:], **kwargs)
+
+            if result and not isinstance(result, Ignore):
                 return result
 
         return None

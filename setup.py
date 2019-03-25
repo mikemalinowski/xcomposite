@@ -1,11 +1,16 @@
+import os
 import setuptools
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+if os.path.exists('README.md'):
+    with open('README.md', 'r') as fh:
+        long_description = fh.read()
+
+else:
+    long_description = 'A python package exposing the class composition design pattern'
 
 setuptools.setup(
     name='xcomposite',
-    version='2.0.1',
+    version='2.0.5',
     author='Mike Malinowski',
     author_email='mike@twisted.space',
     description='A python package exposing the class composition design pattern',

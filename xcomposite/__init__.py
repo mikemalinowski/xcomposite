@@ -88,6 +88,7 @@ from .decorators import (
     take_range,
     take_average,
     take_first,
+    first_true,
     take_last,
     any_true,
     any_false,
@@ -104,4 +105,4 @@ from .decorators import (
 __author__ = "Michael Malinowski"
 __copyright__ = "Copyright (C) 2019 Michael Malinowski"
 __license__ = "MIT"
-__version__ = "2.0.1"
+__version__ = "2.0.5"
