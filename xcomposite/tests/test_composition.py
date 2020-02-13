@@ -133,5 +133,5 @@ class CompositionTests(unittest.TestCase):
                 msg='Did not assert when accessing an inaccessible attribute',
             )
 
-        except AttributeError:
+        except (AttributeError, NotImplementedError):
             pass

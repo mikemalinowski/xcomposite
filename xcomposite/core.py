@@ -51,6 +51,60 @@ class Composition(object):
         self._components = []
 
     # --------------------------------------------------------------------------
+    def __getattr__(self, item):
+        """
+        This allows a priority order of access for composition classes. By
+        default the base class is always searched first, if the base class
+        does not implement the requested functionality then the components
+        are searched instead.
+
+        :param item: Item to check for
+
+        :return:
+        """
+        # -- To be here means the attribute does not exist on the base
+        # -- class, therefore we need to cycle the components and see
+        # -- if any of those implement the attribute/method
+        for component in self.components():
+            if hasattr(component, item):
+                return getattr(component, item)
+
+        # -- If we still have no match we raise an AttributeError
+        # -- as python usually would
+        raise AttributeError
+
+    # --------------------------------------------------------------------------
+    def __setattr__(self, name, value):
+        """
+        This allows for attribute redirection. By default, when setting a value
+        on an attribute it will set it on this class if this class already
+        has it declared. If it does not it will attempt to set it on the
+        first component with a match.
+
+        If there are no components matching, and the base class does not have
+        have it declare it simply adds it to the base class as python would
+        do by default.
+
+        :param name: Name of the attribute to set
+        :param value: Value to set to
+
+        :return:
+        """
+        # -- To be here means the base class does not have it declared, so
+        # -- attempt to check the components of the composite class, and
+        # -- set the first we find
+        if '_components' in self.__dict__:
+            for component in self.__dict__['_components']:
+                if hasattr(component, name):
+                    setattr(component, name, value)
+                    return
+
+        # -- To get here means non of the components implement
+        # -- the attribute, so we just apply the attribute to
+        # -- ourselves.
+        self.__dict__[name] = value
+
+    # --------------------------------------------------------------------------
     def __repr__(self):
         """
         Printing only the class is not enough if this is made up of multiple
