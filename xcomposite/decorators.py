@@ -10,6 +10,7 @@ def _methods(composition_class, method_name):
     return [
         getattr(component, method_name)
         for component in composition_class.components()
+        if hasattr(component, method_name)
     ]
 
 
@@ -131,7 +132,6 @@ def take_first(func):
     def inner(*args, **kwargs):
         for method in _methods(args[0], func.__name__):
             result = method(*args[1:], **kwargs)
-
             if not isinstance(result, Ignore):
                 return result
 
@@ -222,7 +222,7 @@ def extend_unique(func):
             if not isinstance(result, Ignore):
                 extended_results.extend(result)
 
-        return list(set(extended_results))
+        return list(dict.fromkeys(extended_results))
 
     return inner
 
@@ -363,21 +363,17 @@ def append_results(func):
 def append_unique(func):
     """
     This decorator will append each result - regardless of type - into a
-    list. 
+    list.
     """
 
     def inner(*args, **kwargs):
-        return list(
-            set(
-                _results(
-                    args[0],
-                    func.__name__,
-                    *args,
-                    **kwargs
-                )
-            )
+        results = _results(
+            args[0],
+            func.__name__,
+            *args,
+            **kwargs
         )
-
+        return list(dict.fromkeys(results))
     return inner
 
 
