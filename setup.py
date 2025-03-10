@@ -10,9 +10,9 @@ else:
 
 setuptools.setup(
     name='xcomposite',
-    version='2.0.5',
+    version='2.0.7',
     author='Mike Malinowski',
-    author_email='mike@twisted.space',
+    author_email='mike.malinowski@outlook.com',
     description='A python package exposing the class composition design pattern',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -26,5 +26,5 @@ setuptools.setup(
     package_data={
         '': ['examples/game/data/*.json'],
     },
-    keywords="xcomposite composite composition inheritence side combine",
+    keywords="xcomposite composite composition inheritance side combine",
 )

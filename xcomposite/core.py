@@ -153,19 +153,30 @@ class Composition(object):
         """
         self._components.append(component)
 
+
     # --------------------------------------------------------------------------
-    def unbind(self, component_type):
+    def unbind(self, component_or_type):
         """
         Removes a components of a given type from the component
         list.
 
-        :param component_type: Class Type to remove
+        :param component_or_type: Class Type or instance to remove
 
         :return:
         """
         for component in self._components[:]:
-            if isinstance(component, component_type):
+            if component == component_or_type:
                 self._components.remove(component)
+                return True
+
+            try:
+                if isinstance(component, component_or_type):
+                    self._components.remove(component)
+                    return True
+
+            except TypeError:
+                continue
+        return False
 
 
 # ------------------------------------------------------------------------------
