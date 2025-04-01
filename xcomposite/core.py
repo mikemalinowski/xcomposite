@@ -71,7 +71,7 @@ class Composition(object):
 
         # -- If we still have no match we raise an AttributeError
         # -- as python usually would
-        raise AttributeError
+        raise AttributeError("%s has no attribute %s" % (self, item))
 
     # --------------------------------------------------------------------------
     def __setattr__(self, name, value):

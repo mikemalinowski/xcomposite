@@ -10,7 +10,7 @@ else:
 
 setuptools.setup(
     name='xcomposite',
-    version='2.0.7',
+    version='2.0.8',
     author='Mike Malinowski',
     author_email='mike.malinowski@outlook.com',
     description='A python package exposing the class composition design pattern',
